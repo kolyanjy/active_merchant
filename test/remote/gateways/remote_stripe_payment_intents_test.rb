@@ -408,6 +408,22 @@ class RemoteStripeIntentsTest < Test::Unit::TestCase
     end
   end
 
+  def test_purchase_sends_network_transaction_id_separate_from_stored_creds
+    [@visa_card, @three_ds_authentication_required_setup_for_off_session].each do |card_to_use|
+      assert purchase = @gateway.purchase(@amount, card_to_use, {
+        currency: 'USD',
+        execute_threed: true,
+        confirm: true,
+        off_session: true,
+        network_transaction_id: '1234567891011'
+      })
+      assert_success purchase
+      assert_equal 'succeeded', purchase.params['status']
+      assert purchase.params.dig('charges', 'data')[0]['captured']
+      assert purchase.params.dig('charges', 'data')[0]['payment_method_details']['card']['network_transaction_id']
+    end
+  end
+
   def test_purchase_works_with_stored_credentials
     [@three_ds_off_session_credit_card, @three_ds_authentication_required_setup_for_off_session].each do |card_to_use|
       assert purchase = @gateway.purchase(@amount, card_to_use, {
@@ -415,6 +431,7 @@ class RemoteStripeIntentsTest < Test::Unit::TestCase
         execute_threed: true,
         confirm: true,
         off_session: true,
+        setup_future_usage: true,
         stored_credential: {
           network_transaction_id: '1098510912210968', # TEST env seems happy with any value :/
           ds_transaction_id: 'null' # this is not req
