@@ -622,6 +622,12 @@ ogone:
   password: PASSWORD
   signature: SIGNATURE
 
+payment_highway:
+  sph_account: test
+  sph_merchant: test_merchantId
+  account_key: testKey
+  account_secret: testSecret
+
 # Get credentials or api keys from https://dashboard.omise.co
 omise:
   public_key: pkey_test_4zt0fss8gs0z6b4zlsq
